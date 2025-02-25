@@ -1,0 +1,29 @@
+name: Build Veyon for Windows
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          choco install mingw cmake nsis qt5-sdk -y
+
+      - name: Configure Build
+        run: cmake -B build -G "MinGW Makefiles"
+
+      - name: Compile
+        run: cmake --build build --config Release
+
+      - name: Package with NSIS
+        run: makensis veyon_installer.nsi
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v2
+        with:
+          name: Veyon-Setup
+          path: build/Veyon-Setup.exe
